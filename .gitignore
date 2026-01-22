@@ -175,3 +175,6 @@ events.out.tfevents.*
 .vscode/settings.json
 .vscode/launch.json
 .vscode/extensions.json
+
+# Kiro IDE
+.kiro/
