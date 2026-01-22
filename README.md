@@ -43,7 +43,6 @@ The system successfully generates syntactically valid ABC notation tunes that fo
 │   ├── __init__.py
 │   ├── generator.py                    # Music generation logic
 │   ├── model_loader.py                 # Model loading utilities
-│   ├── audio_converter.py              # ABC to audio conversion
 │   ├── validator.py                    # Input validation
 │   └── request_handler.py              # Request processing
 ├── config/
@@ -257,19 +256,6 @@ Response:
 }
 ```
 
-### Generate MP4/WAV
-```
-POST /api/generate-mp4
-Content-Type: application/json
-
-{
-  "abc_notation": "X:1\nT:Generated...",
-  "format": "wav"
-}
-
-Response: Binary audio file
-```
-
 ---
 
 ## Key Insights
@@ -312,7 +298,6 @@ Response: Binary audio file
 - **Flask** - Web framework
 - **PyTorch** - Deep learning framework
 - **NumPy** - Numerical computing
-- **SciPy** - Audio processing
 - **python-dotenv** - Environment configuration
 - **pytest** - Testing framework
 - **hypothesis** - Property-based testing

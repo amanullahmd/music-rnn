@@ -7,7 +7,6 @@ from flask import Blueprint, request, jsonify, current_app, send_file
 from services.model_loader import ModelLoader
 from services.validator import InputValidator
 from services.generator import MusicGenerator
-from services.audio_converter import AudioConverter
 
 logger = logging.getLogger(__name__)
 
@@ -17,15 +16,13 @@ api_bp = Blueprint('api', __name__)
 model_loader = None
 validator = InputValidator()
 generator = None
-audio_converter = None
 
 def init_services():
     """Initialize services on first request"""
-    global model_loader, generator, audio_converter
+    global model_loader, generator
     if model_loader is None:
         model_loader = ModelLoader(current_app.config['MODEL_PATH'])
         generator = MusicGenerator(model_loader)
-        audio_converter = AudioConverter()
 
 @api_bp.before_request
 def before_request():
@@ -80,48 +77,6 @@ def generate():
     except Exception as e:
         logger.error(f'Generation error: {str(e)}', exc_info=True)
         return jsonify({'error': 'Generation failed', 'details': str(e)}), 500
-
-@api_bp.route('/generate-mp4', methods=['POST'])
-def generate_mp4():
-    """
-    Generate WAV audio file from ABC notation
-    
-    Request JSON:
-    {
-        "notation": "string (ABC notation)"
-    }
-    
-    Response: WAV file download
-    """
-    try:
-        data = request.get_json()
-        notation = data.get('notation', '')
-        
-        if not notation or notation.strip() == '':
-            return jsonify({'error': 'No notation provided'}), 400
-        
-        logger.info('Generating WAV audio from ABC notation...')
-        
-        # Convert ABC to WAV
-        audio_path = audio_converter.abc_to_wav(notation)
-        
-        if not os.path.exists(audio_path):
-            return jsonify({'error': 'Audio generation failed'}), 500
-        
-        logger.info(f'WAV generated successfully: {audio_path}')
-        
-        # Send file
-        timestamp = os.path.basename(audio_path).split('.')[0]
-        return send_file(
-            audio_path,
-            mimetype='audio/wav',
-            as_attachment=True,
-            download_name=f'music_{timestamp}.wav'
-        )
-        
-    except Exception as e:
-        logger.error(f'Audio generation error: {str(e)}', exc_info=True)
-        return jsonify({'error': 'Audio generation failed', 'details': str(e)}), 500
 
 @api_bp.route('/health', methods=['GET'])
 def health():
